@@ -1,0 +1,9 @@
+{
+  "private": true,
+  "name": "actions",
+  "version": "0.0.0",
+  "prettier": "@tobysmith568/prettier-config",
+  "dependencies": {
+    "@tobysmith568/prettier-config": "^2.0.1"
+  }
+}
