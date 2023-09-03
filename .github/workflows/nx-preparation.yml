@@ -1,0 +1,88 @@
+name: Prepare Nx branch
+
+on:
+  workflow_call:
+    inputs:
+      node_version:
+        description: Node.js version
+        type: number
+        required: true
+        default: 18
+      run_prettier:
+        description: Run Prettier
+        type: boolean
+        required: false
+        default: true
+    outputs:
+      branch_name:
+        description: Branch name
+        value: ${{ jobs.prepare.outputs.branch_name }}
+
+defaults:
+  run:
+    shell: pwsh
+
+jobs:
+  prepare:
+    name: Prepare Nx branch
+
+    runs-on: ubuntu-latest
+
+    outputs:
+      branch_name: ${{ steps.branch_name.outputs.branchName }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ inputs.node_version }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Get migrations file
+        run: npx nx migrate latest
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Apply migrations
+        run: npx nx migrate --run-migrations
+
+      - name: Run Prettier
+        if: ${{ inputs.run_prettier }}
+        run: npx prettier --write .
+
+      - name: Remove migrations file
+        run: Remove-Item "migrations.json"
+
+      - name: Detect uncommitted changes
+        id: shouldCommit
+        run: |
+          $shouldCommit = (git status --porcelain).Length -ne 0
+          "{shouldCommit}=$shouldCommit" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+
+      - name: Create branch name
+        if: ${{ steps.shouldCommit.outputs.shouldCommit == 'True' }}
+        id: branch_name
+        run: |
+          $branchName = "actions/migrate-nx/${{ github.run_attempt }}"
+          "{branchName}=$branchName" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+
+      - name: Create branch
+        if: ${{ steps.shouldCommit.outputs.shouldCommit == 'True' }}
+        run: |
+          git checkout -b ${{ steps.branch_name.outputs.branchName }}
+
+      - name: Commit changes
+        if: ${{ steps.shouldCommit.outputs.shouldCommit == 'True' }}
+        run: |
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add .
+          git commit -m "Migrate NX"
+          git push
