@@ -54,7 +54,7 @@ jobs:
         run: npx nx migrate --run-migrations
 
       - name: Run Prettier
-        if: ${{ inputs.run_prettier }}
+        if: inputs.run_prettier
         run: npx prettier --write .
 
       - name: Remove migrations file
@@ -67,19 +67,19 @@ jobs:
           "{shouldCommit}=$shouldCommit" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
 
       - name: Create branch name
-        if: ${{ steps.shouldCommit.outputs.shouldCommit == 'True' }}
+        if: steps.shouldCommit.outputs.shouldCommit
         id: branch_name
         run: |
           $branchName = "actions/migrate-nx/${{ github.run_attempt }}"
           "{branchName}=$branchName" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
 
       - name: Create branch
-        if: ${{ steps.shouldCommit.outputs.shouldCommit == 'True' }}
+        if: steps.shouldCommit.outputs.shouldCommit
         run: |
           git checkout -b ${{ steps.branch_name.outputs.branchName }}
 
       - name: Commit changes
-        if: ${{ steps.shouldCommit.outputs.shouldCommit == 'True' }}
+        if: steps.shouldCommit.outputs.shouldCommit
         run: |
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
