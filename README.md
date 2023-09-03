@@ -1,2 +1,2 @@
-# action
+# actions
 My reusable GitHub Actions
