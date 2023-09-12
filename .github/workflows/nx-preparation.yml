@@ -77,11 +77,17 @@ jobs:
           $shouldCommit = (git status --porcelain).Length -ne 0
           "shouldCommit=$shouldCommit" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
 
+      - name: Set git user
+        if: steps.shouldCommit.outputs.shouldCommit
+        run: |
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+
       - name: Create branch name
         if: steps.shouldCommit.outputs.shouldCommit
         id: branch_name
         run: |
-          $branchName = "actions/migrate-nx/${{ github.run_attempt }}"
+          $branchName = "actions/migrate-nx/${{ github.run_number }}/${{ github.run_attempt }}"
           "branchName=$branchName" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
 
       - name: Create branch
@@ -92,8 +98,10 @@ jobs:
       - name: Commit changes
         if: steps.shouldCommit.outputs.shouldCommit
         run: |
-          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
           git add .
           git commit -m "Migrate NX"
-          git push
+
+      - name: Push changes
+        if: steps.shouldCommit.outputs.shouldCommit
+        run: |
+          git push --set-upstream origin ${{ steps.branch_name.outputs.branchName }}
