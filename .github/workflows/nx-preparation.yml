@@ -40,6 +40,9 @@ jobs:
       branch_name: ${{ steps.branch_name.outputs.branchName }}
       should_continue: ${{ steps.shouldCommit.outputs.shouldCommit }}
 
+    permissions:
+      contents: write
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
