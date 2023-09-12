@@ -75,14 +75,14 @@ jobs:
         id: shouldCommit
         run: |
           $shouldCommit = (git status --porcelain).Length -ne 0
-          "{shouldCommit}=$shouldCommit" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          "shouldCommit=$shouldCommit" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
 
       - name: Create branch name
         if: steps.shouldCommit.outputs.shouldCommit
         id: branch_name
         run: |
           $branchName = "actions/migrate-nx/${{ github.run_attempt }}"
-          "{branchName}=$branchName" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          "branchName=$branchName" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
 
       - name: Create branch
         if: steps.shouldCommit.outputs.shouldCommit
