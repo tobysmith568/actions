@@ -1,0 +1,59 @@
+name: Merge Nx branch
+
+on:
+  workflow_call:
+    inputs:
+      cwd:
+        description: Current working directory
+        type: string
+        required: false
+        default: ./
+      branch_name:
+        description: Branch name
+        type: string
+        required: false
+        default: actions/migrate-nx/${{ github.run_number }}/${{ github.run_attempt }}
+
+defaults:
+  run:
+    shell: pwsh
+
+jobs:
+  pr:
+    name: Merge Nx branch
+
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.branch_name }}
+
+      - name: Checkout main
+        run: |
+          git checkout main
+          git pull
+
+      - name: Set git user
+        run: |
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+
+      - name: Get new Nx version
+        id: nx-version
+        run: |
+          $regexResult = npm list nx --package-lock-only --depth 0 | Select-String "nx@(.*)"
+          "nxVersion=$regexResult.matches.groups[1].value" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+        working-directory: ${{ inputs.cwd }}
+
+      - name: Merge branch
+        run: |
+          git merge --no-edit ${{ inputs.branch_name }}
+
+      - name: Push changes
+        run: |
+          git push

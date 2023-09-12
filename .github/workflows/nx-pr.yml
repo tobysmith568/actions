@@ -1,0 +1,65 @@
+name: Create Nx pull request
+
+on:
+  workflow_call:
+    inputs:
+      node_version:
+        description: Node.js version
+        type: number
+        required: false
+        default: 18
+      cwd:
+        description: Current working directory
+        type: string
+        required: false
+        default: ./
+      branch_name:
+        description: Branch name
+        type: string
+        required: false
+        default: actions/migrate-nx/${{ github.run_number }}/${{ github.run_attempt }}
+
+defaults:
+  run:
+    shell: pwsh
+
+jobs:
+  pr:
+    name: Create Nx pull request
+
+    runs-on: ubuntu-latest
+
+    permissions:
+      pull-requests: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.branch_name }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ inputs.node_version }}
+          cache: npm
+
+      - name: Set git user
+        run: |
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+
+      - name: Get new Nx version
+        id: nx-version
+        run: |
+          $regexResult = npm list nx --package-lock-only --depth 0 | Select-String "nx@(.*)"
+          "nxVersion=$regexResult.matches.groups[1].value" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+        working-directory: ${{ inputs.cwd }}
+
+      - name: Create pull request
+        run: |
+          gh pr create \
+            --base main \
+            --head ${{ inputs.branch_name }} \
+            --title "Migrate Nx to ${{ steps.nx-version.outputs.nxVersion }}" \
+            --body "This pull request was created by a GitHub action."
