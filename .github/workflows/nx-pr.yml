@@ -63,3 +63,5 @@ jobs:
           $title = "Migrate Nx to ${{ steps.nx-version.outputs.nxVersion }}"
           $body = "This pull request was created by a GitHub action."
           gh pr create --base $base --head $head --title $title --body $body
+        env:
+          GH_TOKEN: ${{ github.token }}
