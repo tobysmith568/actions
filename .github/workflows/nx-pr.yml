@@ -58,8 +58,8 @@ jobs:
 
       - name: Create pull request
         run: |
-          gh pr create \
-            --base main \
-            --head ${{ inputs.branch_name }} \
-            --title "Migrate Nx to ${{ steps.nx-version.outputs.nxVersion }}" \
-            --body "This pull request was created by a GitHub action."
+          $base = "main"
+          $head = "${{ inputs.branch_name }}"
+          $title = "Migrate Nx to ${{ steps.nx-version.outputs.nxVersion }}"
+          $body = "This pull request was created by a GitHub action."
+          gh pr create --base $base --head $head --title $title --body $body
