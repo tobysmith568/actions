@@ -22,6 +22,9 @@ on:
       branch_name:
         description: Branch name
         value: ${{ jobs.prepare.outputs.branch_name }}
+      should_continue:
+        description: true if a branch was created
+        value: ${{ jobs.prepare.outputs.should_continue }}
 
 defaults:
   run:
@@ -35,6 +38,7 @@ jobs:
 
     outputs:
       branch_name: ${{ steps.branch_name.outputs.branchName }}
+      should_continue: ${{ steps.shouldCommit.outputs.shouldCommit }}
 
     steps:
       - name: Checkout repository
