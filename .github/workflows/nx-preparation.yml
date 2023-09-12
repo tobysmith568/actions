@@ -6,13 +6,18 @@ on:
       node_version:
         description: Node.js version
         type: number
-        required: true
+        required: false
         default: 18
       run_prettier:
         description: Run Prettier
         type: boolean
         required: false
         default: true
+      cwd:
+        description: Current working directory
+        type: string
+        required: false
+        default: ./
     outputs:
       branch_name:
         description: Branch name
@@ -43,22 +48,28 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+        working-directory: ${{ inputs.cwd }}
 
-      - name: Get migrations file
+      - name: Create migrations file
         run: npx nx migrate latest
+        working-directory: ${{ inputs.cwd }}
 
       - name: Install dependencies
         run: npm ci
+        working-directory: ${{ inputs.cwd }}
 
       - name: Apply migrations
         run: npx nx migrate --run-migrations
+        working-directory: ${{ inputs.cwd }}
 
       - name: Run Prettier
         if: inputs.run_prettier
         run: npx prettier --write .
+        working-directory: ${{ inputs.cwd }}
 
       - name: Remove migrations file
         run: Remove-Item "migrations.json"
+        working-directory: ${{ inputs.cwd }}
 
       - name: Detect uncommitted changes
         id: shouldCommit
