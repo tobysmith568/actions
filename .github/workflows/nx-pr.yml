@@ -53,7 +53,7 @@ jobs:
         id: nx-version
         run: |
           $regexResult = npm list nx --package-lock-only --depth 0 | Select-String "nx@(.*)"
-          "nxVersion=$regexResult.matches.groups[1].value" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          "nxVersion=$($regexResult.matches.groups[1].value)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
         working-directory: ${{ inputs.cwd }}
 
       - name: Create pull request
