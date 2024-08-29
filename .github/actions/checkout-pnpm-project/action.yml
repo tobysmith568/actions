@@ -3,6 +3,12 @@ name: Checkout pnpm project
 description: |
   Checkout a pnpm project and install dependencies with caching
 
+branding:
+  icon: arrow-down-circle
+  color: blue
+
+author: tobysmith568
+
 inputs:
   package-json:
     description: Path to the package.json file
@@ -12,8 +18,6 @@ inputs:
     description: Node.js version
     required: false
     default: "20"
-
-author: Toby Smith
 
 runs:
   using: composite
