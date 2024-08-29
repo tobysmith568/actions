@@ -1,0 +1,35 @@
+name: Checkout pnpm project
+
+description: |
+  Checkout a pnpm project and install dependencies with caching
+
+inputs:
+  package-json:
+    description: Path to the package.json file
+    required: false
+    default: ./package.json
+  node-version:
+    description: Node.js version
+    required: false
+    default: "20"
+
+author: Toby Smith
+
+runs:
+  using: composite
+
+  steps:
+    - uses: actions/checkout@v4
+
+    - name: Install pnpm
+      uses: pnpm/action-setup@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20
+        cache: pnpm
+
+    - name: Install dependencies
+      run: pnpm install
+      shell: pwsh
