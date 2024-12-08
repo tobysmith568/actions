@@ -18,12 +18,18 @@ inputs:
     description: Node.js version
     required: false
     default: "20"
+  ref:
+    description: The git ref to checkout
+    default: ""
+    required: false
 
 runs:
   using: composite
 
   steps:
     - uses: actions/checkout@v4
+      with:
+        ref: ${{ inputs.ref }}
 
     - name: Install pnpm
       uses: pnpm/action-setup@v4
@@ -31,10 +37,18 @@ runs:
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: 20
+        node-version: ${{ inputs.node-version }}
         cache: pnpm
         registry-url: https://registry.npmjs.org
+
+    - name: Set working directory from package.json path
+      id: set-working-dir
+      shell: pwsh
+      run: |
+        $dir = Split-Path "${{ inputs.package-json }}"
+        echo "working_dir=$dir" >> $env:GITHUB_ENV
 
     - name: Install dependencies
       run: pnpm install
       shell: pwsh
+      working-directory: ${{ env.working_dir }}
