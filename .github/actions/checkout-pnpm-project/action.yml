@@ -23,6 +23,10 @@ inputs:
     default: ""
     required: false
 
+defaults:
+  run:
+    shell: pwsh
+
 runs:
   using: composite
 
