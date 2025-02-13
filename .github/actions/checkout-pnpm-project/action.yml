@@ -17,7 +17,7 @@ inputs:
   node-version:
     description: Node.js version
     required: false
-    default: "20"
+    default: "22"
   ref:
     description: The git ref to checkout
     default: ""
