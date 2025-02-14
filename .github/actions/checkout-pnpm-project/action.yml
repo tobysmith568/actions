@@ -60,3 +60,12 @@ runs:
       run: pnpm install
       shell: pwsh
       working-directory: ${{ env.working_dir }}
+
+    - name: Log versions
+      shell: pwsh
+      run: |
+        echo "Node.JS => $(node --version || echo 'not installed')"
+        echo "Corepack => $(corepack --version || echo 'not installed')"
+        echo "npm => $(npm --version || echo 'not installed')"
+        echo "pnpm => $(pnpm --version || echo 'not installed')"
+       
