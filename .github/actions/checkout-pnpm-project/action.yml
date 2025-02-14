@@ -30,14 +30,6 @@ runs:
     - uses: actions/checkout@v4
       with:
         ref: ${{ inputs.ref }}
-        
-    - name: Use Latest Corepack
-      shell: pwsh
-      run: |
-        echo "Before: corepack version => $(corepack --version || echo 'not installed')"
-        npm install -g corepack@latest
-        echo "After : corepack version => $(corepack --version)"
-        corepack enable
 
     - name: Install pnpm
       uses: pnpm/action-setup@v4
@@ -48,6 +40,14 @@ runs:
         node-version: ${{ inputs.node-version }}
         cache: pnpm
         registry-url: https://registry.npmjs.org
+        
+    - name: Use Latest Corepack
+      shell: pwsh
+      run: |
+        echo "Before: corepack version => $(corepack --version || echo 'not installed')"
+        npm install -g corepack@latest
+        echo "After : corepack version => $(corepack --version)"
+        corepack enable
 
     - name: Set working directory from package.json path
       id: set-working-dir
