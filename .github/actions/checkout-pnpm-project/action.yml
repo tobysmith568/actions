@@ -45,7 +45,7 @@ runs:
       shell: pwsh
       run: |
         echo "Before: corepack version => $(corepack --version || echo 'not installed')"
-        npm install -g corepack@latest
+        npm install -g corepack@latest --force
         echo "After : corepack version => $(corepack --version)"
         corepack enable
 
