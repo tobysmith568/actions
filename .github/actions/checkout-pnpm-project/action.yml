@@ -40,14 +40,19 @@ runs:
         node-version: ${{ inputs.node-version }}
         cache: pnpm
         registry-url: https://registry.npmjs.org
+
+      # https://github.com/actions/setup-node/issues/1222#issuecomment-2676230643
+    - name: Clear Hosted Toolcache for Corepack
+      if: runner.os == 'Windows'
+      shell: pwsh
+      run: Remove-Item -Recurse -Force (Get-Command corepack.cmd).Path
         
+      # https://vercel.com/guides/corepack-errors-github-actions
     - name: Use Latest Corepack
       shell: pwsh
       run: |
         echo "Before: corepack version => $(corepack --version || echo 'not installed')"
-        # Pinned at 0.32.0 because of pnpm error: "Error: Cannot find matching keyid"
-        # https://vercel.com/guides/corepack-errors-github-actions
-        npm install -g corepack@0.32.0 --force
+        npm install -g corepack@latest --force
         echo "After : corepack version => $(corepack --version)"
         corepack enable
 
